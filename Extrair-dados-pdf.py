@@ -92,7 +92,7 @@ now = datetime.datetime.now()
 #no banco de destino todos os arquivos em formato .csv quando for chamado. Apos
 #a chamada, todos os arquivos em formato .csv sao excluidos dessa pasta.
 Chama_script_banco_dados=True
-nome_script_banco_dados=""
+nome_script_banco_dados="import_data.sh"
 ####################################################################################
 
 
