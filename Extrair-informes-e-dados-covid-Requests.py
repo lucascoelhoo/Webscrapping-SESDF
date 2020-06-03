@@ -55,7 +55,7 @@ import wget
 from bs4 import BeautifulSoup
 import time
 import os
-import codecs
+#import codecs
 import unicodedata
 import csv
 import datetime
