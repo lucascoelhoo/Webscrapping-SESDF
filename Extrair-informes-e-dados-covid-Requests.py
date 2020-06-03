@@ -177,7 +177,7 @@ while 1:
             index+=1
 
             #chamada para execucao do script que extrai os dados de arquivos em formato .pdf para tabelas em formato .csv, a chamada precisa do nome do arquivo
-            os.system(str(script_extrator_dados+" "+name_file))
+            os.system(str(direc_folders+script_extrator_dados+" "+name_file))
 
             
 
