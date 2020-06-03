@@ -72,7 +72,7 @@ print(filename_entry)
 
 excluir_essa_linha="RA em investigação" #Linha que, em alguns caso, apresentou problemas de formatacao e nao tem valor para pesquisa, e portanto, caso necessario, eh excluida da extracao
 
-input_path = "" #Como estamos usando relative paths, não precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessário usar \\ como divisor
+input_path = "" #Como estamos usando relative paths, não precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessário usar / como divisor
 
 reports_directory="PROGRAMA-informes-covid"
 
@@ -357,13 +357,13 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
 
                 #o comando abaixo eh o responsavel por criar o arquivo csv exportando o frame do pacote pandas. A variavel ''plotname'' tem o mesmo nome do arquivo
                 #de destino, por isso foi reutilizado em todo o programa. Inicialmente, a intencao era que o programa salvasse os plots.
-                covid_df.to_csv(input_path+csv_backup_directory+"\\"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                covid_df.to_csv(input_path+csv_backup_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
 
                 if(Chama_script_banco_dados==True):
-                    covid_df.to_csv(input_path+csv_directory+"\\"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
-                    os.system(str(input_path+csv_directory+"\\"+nome_script_banco_dados))
+                    covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                    os.system(str(input_path+csv_directory+"/"+nome_script_banco_dados))
                     time.sleep(5)
-                    os.remove(input_path+csv_directory+"\\"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                    os.remove(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
                 
             except Exception as e:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -375,12 +375,12 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
                 date_string=str(datas_encontradas.group(0))
                 date=date_string.split("/")
                 print(date)
-                covid_df.to_csv(input_path+csv_backup_directory+"\\"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                covid_df.to_csv(input_path+csv_backup_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
                 if(Chama_script_banco_dados==True):
-                    covid_df.to_csv(input_path+csv_directory+"\\"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
-                    os.system(str(input_path+csv_directory+"\\"+nome_script_banco_dados))
+                    covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                    os.system(str(input_path+csv_directory+"/"+nome_script_banco_dados))
                     time.sleep(5)
-                    os.remove(input_path+csv_directory+"\\"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                    os.remove(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
 
             with open(nome_arquivo_log, 'a', newline='') as f:
                 writer = csv.writer(f)

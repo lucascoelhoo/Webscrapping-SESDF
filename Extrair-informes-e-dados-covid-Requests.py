@@ -69,7 +69,7 @@ import shutil
 link_sesdf='http://www.saude.df.gov.br/boletinsinformativos-divep-cieves/'
 nome_arquivo_log='log-extracao-web.csv'
 now = datetime.datetime.now()
-direc_folders='' #Como estamos usando relative paths, não precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessário usar \\ como divisor
+direc_folders='' #Como estamos usando relative paths, não precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessário usar / como divisor
 folder_report_name='PROGRAMA-informes-covid' 
 folder_download_name='PROGRAMA-informes-download'
 script_extrator_dados='Extrair-dados-pdf.py'
@@ -113,7 +113,7 @@ while 1:
         
         files_downloaded = os.listdir(direc_folders+folder_download_name) # dir is your directory path
         for file in files_downloaded:
-            os.remove(str(direc_folders+folder_download_name+str("\\")+str(file)))
+            os.remove(str(direc_folders+folder_download_name+str("/")+str(file)))
 
         #mime_types = "application/pdf,application/vnd.adobe.xfdf,application/vnd.fdf,application/vnd.adobe.xdp+xml"
         # To prevent download dialog
@@ -159,10 +159,10 @@ while 1:
                 files_downloaded = os.listdir(direc_folders+folder_download_name) # dir is your directory path
                 if(index+1<=9):
                     name_file=str("0"+str(index+1)+str(".pdf"))
-                    os.rename(str(direc_folders+folder_download_name+str("\\")+files_downloaded[0]),str(direc_folders+folder_report_name+str("\\")+"0"+str(index+1)+str(".pdf")) )
+                    os.rename(str(direc_folders+folder_download_name+str("/")+files_downloaded[0]),str(direc_folders+folder_report_name+str("/")+"0"+str(index+1)+str(".pdf")) )
                 else:
                     name_file=str(str(index+1)+str(".pdf"))
-                    os.rename(str(direc_folders+folder_download_name+str("\\")+files_downloaded[0]),str(direc_folders+folder_report_name+str("\\")+str(index+1)+str(".pdf")) )
+                    os.rename(str(direc_folders+folder_download_name+str("/")+files_downloaded[0]),str(direc_folders+folder_report_name+str("/")+str(index+1)+str(".pdf")) )
                 print(str(index+1)+str(".pdf"))
                 with open(nome_arquivo_log, 'a', newline='') as f:
                     writer = csv.writer(f)
