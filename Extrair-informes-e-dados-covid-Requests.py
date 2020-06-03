@@ -60,7 +60,7 @@ import unicodedata
 import csv
 import datetime
 import shutil
-
+from pathlib import Path
 ####################################################################################
 
 
@@ -69,7 +69,7 @@ import shutil
 link_sesdf='http://www.saude.df.gov.br/boletinsinformativos-divep-cieves/'
 nome_arquivo_log='log-extracao-web.csv'
 now = datetime.datetime.now()
-direc_folders='' #Como estamos usando relative paths, não precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessário usar / como divisor
+direc_folders=str(Path.cwd())+"/" #Como estamos usando relative paths, não precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessário usar / como divisor
 folder_report_name='PROGRAMA-informes-covid' 
 folder_download_name='PROGRAMA-informes-download'
 script_extrator_dados='Extrair-dados-pdf.py'

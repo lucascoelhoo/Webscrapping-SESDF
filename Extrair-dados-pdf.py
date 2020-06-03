@@ -61,6 +61,7 @@ from tika import parser
 import unicodedata
 import shutil
 import time
+from pathlib import Path
 ####################################################################################
 
 
@@ -72,7 +73,7 @@ print(filename_entry)
 
 excluir_essa_linha="RA em investigação" #Linha que, em alguns caso, apresentou problemas de formatacao e nao tem valor para pesquisa, e portanto, caso necessario, eh excluida da extracao
 
-input_path = "" #Como estamos usando relative paths, não precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessário usar / como divisor
+input_path = str(Path.cwd())+"/" #Como estamos usando relative paths, não precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessário usar / como divisor
 
 reports_directory="PROGRAMA-informes-covid"
 
