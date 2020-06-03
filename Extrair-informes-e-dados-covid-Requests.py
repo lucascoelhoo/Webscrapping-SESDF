@@ -47,9 +47,9 @@
 
 #Pacotes a serem usados e/ou importados#############################################
 ####################################################################################
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.firefox.options import Options
+#from selenium import webdriver
+#from selenium.webdriver.common.keys import Keys
+#from selenium.webdriver.firefox.options import Options
 import requests
 import wget
 from bs4 import BeautifulSoup
