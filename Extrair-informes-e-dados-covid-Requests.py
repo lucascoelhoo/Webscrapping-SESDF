@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#SUBSTITUA python3 POR python SE ESTIVER NO WINDOWS
 #########################################################################################################################################################################################################################
 #Desenvolvido por: Lucas Coelho de Almeida
 #
@@ -178,7 +179,7 @@ while 1:
             index+=1
 
             #chamada para execucao do script que extrai os dados de arquivos em formato .pdf para tabelas em formato .csv, a chamada precisa do nome do arquivo
-            os.system(str("python3 ")+str(direc_folders+script_extrator_dados+" "+name_file))
+            os.system(str("python ")+str(direc_folders+script_extrator_dados+" "+name_file))
 
             
 

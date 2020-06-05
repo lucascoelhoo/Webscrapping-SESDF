@@ -93,7 +93,7 @@ now = datetime.datetime.now()
 #deve ser posto na pasta "PROGRAMA-dados-extraidos-covid" e deve ser capaz de salvar
 #no banco de destino todos os arquivos em formato .csv quando for chamado. Apos
 #a chamada, todos os arquivos em formato .csv sao excluidos dessa pasta.
-Chama_script_banco_dados=True
+Chama_script_banco_dados=False
 nome_script_banco_dados="import_data.sh"
 ####################################################################################
 
@@ -167,21 +167,22 @@ def create_df(pdf_content, content_pattern, line_pattern, column_headings,primei
                 # group(1): the value inside the first set of parentheses in line_pattern
                 agency=""
                 agency = str(line_match.group(0))[:-2]
-                #agency=(strip_accents(str(agency)).lower())
-
+                agency=(strip_accents(str(agency).replace(" ","")).lower().replace("*",""))
+                #print(agency)
                 latitude=""
                 longitude=""
                 localidade_deu_certo=False
-                for localidades_interno,latitudes_interno,longitudes_interno in zip(lista_geral_localidades,lista_geral_latitudes,lista_geral_longitudes):
+                for localidades_interno,latitudes_interno,longitudes_interno,nome_oficial_interno in zip(lista_geral_localidades,lista_geral_latitudes,lista_geral_longitudes,lista_geral_localidades_nome_oficial):
                     if((strip_accents(str(agency)).lower()) == localidades_interno):
                         latitude=latitudes_interno
                         longitude=longitudes_interno
+                        agency=nome_oficial_interno
                         localidade_deu_certo=True
                         break
                 if(localidade_deu_certo==False):
                     continue
                         
-
+                
 
                 
 
@@ -189,11 +190,36 @@ def create_df(pdf_content, content_pattern, line_pattern, column_headings,primei
                 # Grab the dollar values, strip whitespace, replace dashes with 0.0, and remove $s and commas
                 # group(2): the value inside the second set of parentheses in line_pattern
                 #print(str(item))
-                values_string = str(item).replace(agency+" ","").replace(",",".")
+                values_string = str(item).replace(str(line_match.group(0))[:-2],"").replace(",",".")
+
                 #print(values_string)
+                values_string_aux=values_string.split()
+                for string_interno,ind_interno in zip(values_string_aux,range(len(values_string_aux))):
+                    if not((string_interno.replace(".","")).isnumeric()):
+                        print(string_interno)
+                        values_string_aux.pop(ind_interno)    
+                values_string=" ".join(values_string_aux)
+                
+                values_string=values_string.split(" ")
+                #print(values_string)
+                for cel,ind in zip(values_string,range(len(values_string))):
+                    if not(cel.replace(".","").isnumeric()):
+                        
+                        #print(cel)
+                        values_string.pop(ind)
+
+                for cel,ind in zip(values_string,range(len(values_string))):
+                    if not(cel.find(".")==-1):
+                        if(len(cel.split(".")[1])>=3):
+                            #print(cel)
+                            #print(cel.split(".")[1])
+                            values_string[ind]=str(cel.split(".")[0])+str(cel.split(".")[1])  
+                            print(values_string[ind])
+                            print(values_string)
+                            print(" ")
                 # Split on whitespace and convert to float to create a sequence of floating-point numbers
-                values = list(values_string.split())
-                #print(values_string.split())
+                values = values_string
+                #print(values_string)
                 #print("FOI ATE AQUI")
                 for valor,cont_valor in zip(values,range(len(values))):
                     if not (str(valor).replace(".","").isnumeric()):
@@ -201,7 +227,7 @@ def create_df(pdf_content, content_pattern, line_pattern, column_headings,primei
                 #print(values)
                 # Extend the floating-point numbers into line_items so line_items remains one list
                 # Append the agency name or revenue source into line_items
-                line_items.append(str(agency).replace("*",""))
+                line_items.append(str(agency))
                 line_items.append(str(latitude))
                 line_items.append(str(longitude))                
                 # Append line_item's values into list_of_line_items to generate a list of lists;
@@ -213,9 +239,9 @@ def create_df(pdf_content, content_pattern, line_pattern, column_headings,primei
                 list_of_line_items.append(line_items)
             except Exception as e:#{}
                 print(e)
-        for line in list_of_line_items:
-            print(len(line))
-            print(line)
+        #for line in list_of_line_items:
+        #    print(len(line))
+        #    print(line)
          #Convert the list of lists into a Pandas DataFrame and specify the column headings
         df = pd.DataFrame(list_of_line_items, columns=column_headings)
         return df
@@ -267,14 +293,14 @@ def create_plot(df, column_to_sort, x_val, y_val, type_of_plot, plot_size, the_t
 #Primeiramente, sao carregadas as localidades e respectivas coordenadas 
 lista_preliminar_localidades = pd.read_csv(localidades_directory+"//"+localidades_file)
 lista_geral_localidades=[]
+lista_geral_localidades_nome_oficial=[]
 lista_geral_latitudes=[]
 lista_geral_longitudes=[]
-for localidades_interno,latitudes_interno,longitudes_interno in zip(lista_preliminar_localidades['regiao'],lista_preliminar_localidades['latitude'],lista_preliminar_localidades['longitude']):
+for localidades_interno,latitudes_interno,longitudes_interno,nome_oficial_interno in zip(lista_preliminar_localidades['regiao'],lista_preliminar_localidades['latitude'],lista_preliminar_localidades['longitude'],lista_preliminar_localidades['nome oficial']):
     lista_geral_localidades.append(strip_accents(str(localidades_interno)).lower())
     lista_geral_latitudes.append(str(latitudes_interno))
     lista_geral_longitudes.append(str(longitudes_interno))
-
-
+    lista_geral_localidades_nome_oficial.append(str(nome_oficial_interno))
 
 
 #criacao do arquivo de log, se necessario
@@ -306,7 +332,6 @@ if(filename_entry=="*.pdf"):
     except:{}
 
 
-
 # Iterate over all PDF files in the folder and process each one in turn
 for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_entry)):
         try:
@@ -324,7 +349,8 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
             
             # Pulos de linhas duplicados sao excluidas
             pdf = pdf.replace('\n\n', '\n')
-            
+            pdf = pdf.replace('  ', ' ')
+            pdf = pdf.replace('  ', ' ')
             #Data do relatorio eh extraida
             date_string=str(pdf)[str(pdf).find("Boletim Epidemiológico do dia ")+len("Boletim Epidemiológico do dia "):str(pdf).find("Boletim Epidemiológico do dia ")+len("Boletim Epidemiológico do dia ")+10]
             date=date_string.split(".")
