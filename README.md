@@ -37,3 +37,7 @@
     - A pasta "PROGRAMA-localidades" contém um arquivo em formato ".csv" que relaciona as localidades e coordenadas geográficas de cada região administrativa e conjunto de regiões existentes na tabela de interesse dos informes diculgados pela SESDF.
     - Os informes só passaram a ter a tabela de interesse a partir do dia 26/03/2020.
     - Mudanças muito drásticas na formatação do documento ou da tabela demandarão revisões do código, embora grande parte das irregularidades presentes nos informes divulgados até o dia 27/05/2020 já foram solucionados.
+    -É necessário se atentar à questão de permissionamento nas pastas e nos scripts quando usado em Linux, tudo nas subpastas deve estar liberado para não ocorrerem erros indesejados que não terão relação com o programa em si.
+    -Problemas e inconsistências em caminhos ocorrem quando se usa "\\" do Windows no Linux. Troque por "/" e prefira o uso da biblioteca "path", dos métodos "join" e semelhantes.
+    -Para evitar erros indesejados rodando em Linux, não esqueça da importância da linha shebang (). 
+    -No Windows, relative paths funcionam muito bem, no Linux não, portanto, para ficar universal, prefira usar o método "Path.cwd()" da "pathlib" para sempre obter o diretório do script/projeto rodando.
