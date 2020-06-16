@@ -102,7 +102,11 @@ def strip_accents(text):
 
 #Loop eterno o qual garante o funcionamento adequado como daemon. Ao final, uma funcao de sleep
 #reduz consumo de memoria a quase zero, permitindo funcionamento em background sem problema de uso de recursos.
-while 1:
+
+#while 1:
+#Comente o if abaixo e descomente o while acim e o sleep ao final para ser um programa que roda em background
+#Trocou-se pela execução simples para integração com agendamento do "crontab" do linux
+if 1:
     print("\n\nINICIANDO NOVA SESSÃO\n")
     try:
     #if(1): #Descomente essa linha e comente as linhas try logo acima e todo o bloco except ao final do programa caso nao consiga encontrar de forma clara a fonte de uma excecao
@@ -148,6 +152,9 @@ while 1:
         r=requests.get(link_sesdf)
         soup = BeautifulSoup(r.text, 'html.parser')
         list_dir = os.listdir(direc_folders+folder_report_name)
+        for name,index_interno in zip(list_dir,range(len(list_dir))):
+            if not name.endswith(".pdf"):
+                list_dir.pop(index_interno)
         number_files = len(list_dir)
         lista_elements=(soup.find("div", {"id":"conteudo"})).select('a')
         index=number_files
@@ -179,6 +186,7 @@ while 1:
             index+=1
 
             #chamada para execucao do script que extrai os dados de arquivos em formato .pdf para tabelas em formato .csv, a chamada precisa do nome do arquivo
+            #no linux é python3, no windows é apenas python
             os.system(str("python3 ")+str(direc_folders+script_extrator_dados+" "+name_file))
 
             
@@ -198,6 +206,6 @@ while 1:
             writer.writerow([str((now.strftime("%Y-%m-%d %H:%M:%S"))),str(0),"nothing","FRACASSO FALHA GERAL"])
             f.close()
 
-    print("\n\nFIM DA SESSÃO, DORMINDO POR "+str(sleep_time)+" segundos")
-    time.sleep(sleep_time)
+    #print("\n\nFIM DA SESSÃO, DORMINDO POR "+str(sleep_time)+" segundos")
+    #time.sleep(sleep_time)
 ####################################################################################

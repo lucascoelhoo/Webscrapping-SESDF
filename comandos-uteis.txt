@@ -1,0 +1,15 @@
+Comandos Importantes para a aplicacao:
+
+nohup my_command > my.log 2>&1 &
+
+echo $! > save_pid.txt
+
+kill -9 `cat save_pid.txt`
+
+rm save_pid.txt
+
+chmod +x arquivo executal
+
+chmod +rwx diretorio
+
+pidstat -p PID
