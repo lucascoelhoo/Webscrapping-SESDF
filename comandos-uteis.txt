@@ -13,3 +13,5 @@ chmod +x arquivo executal
 chmod +rwx diretorio
 
 pidstat -p PID
+
+tail -100 <log file>   > newLogfile  #serve para copiar as ultimas entradas do syslog, muito util quando tem mt coisa rodando
