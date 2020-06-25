@@ -389,7 +389,7 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
 
                 if(Chama_script_banco_dados==True):
                     covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
-                    os.system(str(input_path+csv_directory+"/"+nome_script_banco_dados))
+                    os.system(str("cd ")+str(input_path)+str(" && ")+str(input_path+csv_directory+"/"+nome_script_banco_dados))
                     time.sleep(5)
                     os.remove(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
                 
