@@ -72,9 +72,9 @@ filename_entry=sys.argv[1]
 #filename_entry="*.pdf" #Pode-se descomentar essa linha e comentar a anterior para rodar o programa sem a necessidade de chamada externa
 print(filename_entry)
 
-excluir_essa_linha="RA em investigação" #Linha que, em alguns caso, apresentou problemas de formatacao e nao tem valor para pesquisa, e portanto, caso necessario, eh excluida da extracao
+excluir_essa_linha="RA em investigaÃ§Ã£o" #Linha que, em alguns caso, apresentou problemas de formatacao e nao tem valor para pesquisa, e portanto, caso necessario, eh excluida da extracao
 
-input_path = str(Path.cwd())+"/" #Como estamos usando relative paths, não precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessário usar / como divisor
+input_path = str(Path.cwd())+"/" #Como estamos usando relative paths, nÃ£o precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessÃ¡rio usar / como divisor
 
 reports_directory="PROGRAMA-informes-covid"
 
@@ -93,7 +93,7 @@ now = datetime.datetime.now()
 #deve ser posto na pasta "PROGRAMA-dados-extraidos-covid" e deve ser capaz de salvar
 #no banco de destino todos os arquivos em formato .csv quando for chamado. Apos
 #a chamada, todos os arquivos em formato .csv sao excluidos dessa pasta.
-Chama_script_banco_dados=False
+Chama_script_banco_dados=True
 nome_script_banco_dados="import_data.sh"
 ####################################################################################
 
@@ -311,8 +311,8 @@ if not(os.path.isfile(nome_arquivo_log)):
         f.close()
         
 #Expressoes regulares que serao usadas na busca dos dados
-expenditures_pattern = r'REGIÃO/RA(.*)(?i:total df)' #Buscar por tudo entre as duas expressoes, ignorando maisuculas e minusculas no segundo termo
-expenditures_pattern2 = r'REGIÃO/RA(.*)TOTAL DF' #Buscar por tudo entre as duas expressoes
+expenditures_pattern = r'REGIÃƒO/RA(.*)(?i:total df)' #Buscar por tudo entre as duas expressoes, ignorando maisuculas e minusculas no segundo termo
+expenditures_pattern2 = r'REGIÃƒO/RA(.*)TOTAL DF' #Buscar por tudo entre as duas expressoes
 covid_pattern = r'^.*?(\d)' #Estrutura dos dados de cada linha da tabela
 
 #Nome verificado na primeira linha relevante da tabela, eh necessario para tentar evitar ao maximo quaisquer erros de formatacao da SES-DF
@@ -352,7 +352,7 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
             pdf = pdf.replace('  ', ' ')
             pdf = pdf.replace('  ', ' ')
             #Data do relatorio eh extraida
-            date_string=str(pdf)[str(pdf).find("Boletim Epidemiológico do dia ")+len("Boletim Epidemiológico do dia "):str(pdf).find("Boletim Epidemiológico do dia ")+len("Boletim Epidemiológico do dia ")+10]
+            date_string=str(pdf)[str(pdf).find("Boletim EpidemiolÃ³gico do dia ")+len("Boletim EpidemiolÃ³gico do dia "):str(pdf).find("Boletim EpidemiolÃ³gico do dia ")+len("Boletim EpidemiolÃ³gico do dia ")+10]
             date=date_string.split(".")
             #print(date[0])
             #print(date[1])
@@ -389,7 +389,7 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
 
                 if(Chama_script_banco_dados==True):
                     covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
-                    os.system(str("cd ")+str(input_path)+str(" && ")+str(input_path+csv_directory+"/"+nome_script_banco_dados))
+                    os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str(input_path+csv_directory+"/"+nome_script_banco_dados))
                     time.sleep(5)
                     os.remove(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
                 
@@ -430,5 +430,6 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
                 f.close()
 
 #####################################################################################################
+
 
 
