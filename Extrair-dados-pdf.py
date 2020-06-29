@@ -58,7 +58,9 @@ import matplotlib.pyplot as plt
 import datetime
 #pd.options.display.mpl_style = 'default'
 import sys
+import tika
 from tika import parser
+tika.initVM()
 import unicodedata
 import shutil
 import time
