@@ -95,7 +95,7 @@ now = datetime.datetime.now()
 #deve ser posto na pasta "PROGRAMA-dados-extraidos-covid" e deve ser capaz de salvar
 #no banco de destino todos os arquivos em formato .csv quando for chamado. Apos
 #a chamada, todos os arquivos em formato .csv sao excluidos dessa pasta.
-Chama_script_banco_dados=True
+Chama_script_banco_dados=False
 nome_script_banco_dados="import_data.sh"
 ####################################################################################
 
@@ -120,7 +120,7 @@ def strip_accents(text):
 
 #Funcao que busca e extrai os dados do relatorio, gerando o frame de dados do pacote pandas##########
 #####################################################################################################
-def create_df(pdf_content, content_pattern, line_pattern, column_headings,primeira_palavra_linha_tabela):
+def create_df(data_pdf,pdf_content, content_pattern, line_pattern, column_headings,primeira_palavra_linha_tabela):
     """Create a Pandas DataFrame from lines of text in a PDF.
 
     Arguments:
@@ -229,12 +229,13 @@ def create_df(pdf_content, content_pattern, line_pattern, column_headings,primei
                 #print(values)
                 # Extend the floating-point numbers into line_items so line_items remains one list
                 # Append the agency name or revenue source into line_items
+                line_items.append(str(data_pdf))
                 line_items.append(str(agency))
                 line_items.append(str(latitude))
                 line_items.append(str(longitude))                
                 # Append line_item's values into list_of_line_items to generate a list of lists;
                 line_items.extend(values)
-                if(len(line_items)<=6):
+                if(len(line_items)<=7):
                     line_items.append(int(0))
                     line_items.append(int(0))
                 # all of the lines that will become rows in the DataFrame
@@ -321,8 +322,8 @@ covid_pattern = r'^.*?(\d)' #Estrutura dos dados de cada linha da tabela
 primeira_palavra_linha_tabela="Sudoeste"
 
 # Nomes das colunas verificadas na tabela a ser extraida
-covid_columns_8args = ['regiao', 'latitude','longitude', 'num', 'porcentagem', 'incidencia','obitos','porcentagem obitos']
-covid_columns_6args = ['regiao', 'latitude','longitude', 'num', 'porcentagem', 'incidencia']
+covid_columns_8args = ['data','regiao', 'latitude','longitude', 'num', 'porcentagem', 'incidencia','obitos','porcentagem obitos']
+covid_columns_6args = ['data','regiao', 'latitude','longitude', 'num', 'porcentagem', 'incidencia']
 
 #O bloco abaixo verifica se a chamada do programa ira ser executada para varios relatorios e, caso afirmativo, exclui quaisquer tabelas ja existentes na pasta alvo
 if(filename_entry=="*.pdf"):
@@ -360,6 +361,13 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
             #print(date[1])
             #print(date[2])
             #print(pdf)
+            if not(len(date)==3):
+                pdf = pdf.replace('\n\n', '\n')
+                datas_encontradas=re.search("(\d)(\d)/(\d)(\d)/(\d)(\d)(\d)(\d)", pdf, re.DOTALL)
+                date_string=str(datas_encontradas.group(0))
+                date=date_string.split("/")
+                #print(date)
+
 
             
             #Sequencia de tentativas de extracao usando a funcao "create_df". Existem relatorios com tabelas de tamanhos diferentes, pois
@@ -367,14 +375,14 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
             #no banco, entao essa sequencia tenta garantir que todas as tabelas .csv geradas sejam o maximo possivel iguais.
             try:
                 try:
-                    covid_df = create_df(pdf, expenditures_pattern, covid_pattern, covid_columns_8args,primeira_palavra_linha_tabela)
+                    covid_df = create_df(str(date[2]+"-"+date[1]+"-"+date[0]),pdf, expenditures_pattern, covid_pattern, covid_columns_8args,primeira_palavra_linha_tabela)
                 except:
-                    covid_df = create_df(pdf, expenditures_pattern, covid_pattern, covid_columns_6args,primeira_palavra_linha_tabela)
+                    covid_df = create_df(str(date[2]+"-"+date[1]+"-"+date[0]),pdf, expenditures_pattern, covid_pattern, covid_columns_6args,primeira_palavra_linha_tabela)
             except:
                 try:
-                    covid_df = create_df(pdf, expenditures_pattern2, covid_pattern, covid_columns_8args,primeira_palavra_linha_tabela)
+                    covid_df = create_df(str(date[2]+"-"+date[1]+"-"+date[0]),pdf, expenditures_pattern2, covid_pattern, covid_columns_8args,primeira_palavra_linha_tabela)
                 except:
-                    covid_df = create_df(pdf, expenditures_pattern2, covid_pattern, covid_columns_6args,primeira_palavra_linha_tabela)
+                    covid_df = create_df(str(date[2]+"-"+date[1]+"-"+date[0]),pdf, expenditures_pattern2, covid_pattern, covid_columns_6args,primeira_palavra_linha_tabela)
 
             #print(covid_df)
             # print(revenue_df)
@@ -394,29 +402,31 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
                     os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str(input_path+csv_directory+"/"+nome_script_banco_dados))
                     time.sleep(5)
                     os.remove(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
-                
-            except Exception as e:
-                exc_type, exc_obj, exc_tb = sys.exc_info()
-                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                print("Warning:")
-                print(exc_type, fname, exc_tb.tb_lineno)
-                pdf = pdf.replace('\n\n', '\n')
-                datas_encontradas=re.search("(\d)(\d)/(\d)(\d)/(\d)(\d)(\d)(\d)", pdf, re.DOTALL)
-                date_string=str(datas_encontradas.group(0))
-                date=date_string.split("/")
-                print(date)
-                covid_df.to_csv(input_path+csv_backup_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
-                if(Chama_script_banco_dados==True):
-                    covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
-                    os.system(str(input_path+csv_directory+"/"+nome_script_banco_dados))
-                    time.sleep(5)
-                    os.remove(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
 
-            with open(nome_arquivo_log, 'a', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerow([(now.strftime("%Y-%m-%d %H:%M:%S")),plotname,"sucesso"])
-                print("SUCESSO: "+str(plotname) )
-                f.close()
+                with open(nome_arquivo_log, 'a', newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow([(now.strftime("%Y-%m-%d %H:%M:%S")),plotname,"sucesso"])
+                    print("SUCESSO: "+str(plotname) )
+                    f.close()                
+            #except Exception as e:
+                #exc_type, exc_obj, exc_tb = sys.exc_info()
+                #fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                #print("Warning:")
+                #print(exc_type, fname, exc_tb.tb_lineno)
+                #pdf = pdf.replace('\n\n', '\n')
+                #datas_encontradas=re.search("(\d)(\d)/(\d)(\d)/(\d)(\d)(\d)(\d)", pdf, re.DOTALL)
+                #date_string=str(datas_encontradas.group(0))
+                #date=date_string.split("/")
+                #print(date)
+                #covid_df.to_csv(input_path+csv_backup_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                #if(Chama_script_banco_dados==True):
+                #    covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                #    os.system(str(input_path+csv_directory+"/"+nome_script_banco_dados))
+                #    time.sleep(5)
+                #    os.remove(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                
+
+
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
