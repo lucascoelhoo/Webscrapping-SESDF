@@ -1,4 +1,4 @@
-#!/usr/bin/python
+
 #########################################################################################################################################################################################################################
 #Desenvolvido por: Lucas Coelho de Almeida
 #
@@ -74,9 +74,10 @@ filename_entry=sys.argv[1]
 #filename_entry="*.pdf" #Pode-se descomentar essa linha e comentar a anterior para rodar o programa sem a necessidade de chamada externa
 print(filename_entry)
 
-excluir_essa_linha="RA em investigaÃ§Ã£o" #Linha que, em alguns caso, apresentou problemas de formatacao e nao tem valor para pesquisa, e portanto, caso necessario, eh excluida da extracao
+excluir_essa_linha="RA em investigação" #Linha que, em alguns caso, apresentou problemas de formatacao e nao tem valor para pesquisa, e portanto, caso necessario, eh excluida da extracao
 
-input_path = str(Path.cwd())+"/" #Como estamos usando relative paths, nÃƒÆ’Ã‚Â£o precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessÃƒÆ’Ã‚Â¡rio usar / como divisor
+#input_path = str(Path.cwd()).replace("\\","/")+"/" #Como estamos usando relative paths, nÃƒÂ£o precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessÃƒÂ¡rio usar / como divisor
+input_path = str("") #Como estamos usando relative paths, nÃƒÂ£o precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessÃƒÂ¡rio usar / como divisor
 
 reports_directory="PROGRAMA-informes-covid"
 
@@ -293,8 +294,9 @@ def create_plot(df, column_to_sort, x_val, y_val, type_of_plot, plot_size, the_t
 #INICIO DO PROGRAMA PRINCIPAL########################################################################
 #####################################################################################################
 
-#Primeiramente, sao carregadas as localidades e respectivas coordenadas 
-lista_preliminar_localidades = pd.read_csv(localidades_directory+"//"+localidades_file)
+#Primeiramente, sao carregadas as localidades e respectivas coordenadas
+print(str(input_path+localidades_directory+"/"+localidades_file))
+lista_preliminar_localidades = pd.read_csv(str(input_path+localidades_directory+"/"+localidades_file))
 lista_geral_localidades=[]
 lista_geral_localidades_nome_oficial=[]
 lista_geral_latitudes=[]
@@ -314,16 +316,16 @@ if not(os.path.isfile(nome_arquivo_log)):
         f.close()
         
 #Expressoes regulares que serao usadas na busca dos dados
-expenditures_pattern = r'REGIÃƒO/RA(.*)(?i:total df)' #Buscar por tudo entre as duas expressoes, ignorando maisuculas e minusculas no segundo termo
-expenditures_pattern2 = r'REGIÃƒO/RA(.*)TOTAL DF' #Buscar por tudo entre as duas expressoes
+expenditures_pattern = r'REGIÃO/RA(.*)(?i:fonte)' #Buscar por tudo entre as duas expressoes, ignorando maisuculas e minusculas no segundo termo
+expenditures_pattern2 = r'REGIÃO/RA(.*)Fonte' #Buscar por tudo entre as duas expressoes
 covid_pattern = r'^.*?(\d)' #Estrutura dos dados de cada linha da tabela
 
 #Nome verificado na primeira linha relevante da tabela, eh necessario para tentar evitar ao maximo quaisquer erros de formatacao da SES-DF
 primeira_palavra_linha_tabela="Sudoeste"
 
 # Nomes das colunas verificadas na tabela a ser extraida
-covid_columns_8args = ['data','regiao', 'latitude','longitude', 'num', 'porcentagem', 'incidencia','obitos','porcentagem obitos']
-covid_columns_6args = ['data','regiao', 'latitude','longitude', 'num', 'porcentagem', 'incidencia']
+covid_columns_8args = ['dataExtracao','regiao', 'latitude','longitude', 'num', 'porcentagem', 'incidencia','obitos','porcentagem obitos']
+covid_columns_6args = ['dataExtracao','regiao', 'latitude','longitude', 'num', 'porcentagem', 'incidencia']
 
 #O bloco abaixo verifica se a chamada do programa ira ser executada para varios relatorios e, caso afirmativo, exclui quaisquer tabelas ja existentes na pasta alvo
 if(filename_entry=="*.pdf"):
@@ -333,114 +335,109 @@ if(filename_entry=="*.pdf"):
         for input_file in zip(list_files_csv):
             os.remove(input_path+csv_directory+input_file)
     except:{}
-
-
-# Iterate over all PDF files in the folder and process each one in turn
+    # Iterate over all PDF files in the folder and process each one in turn
 for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_entry)):
-        try:
-        #if 1:
-            # Nome do arquivo pdf
-            filename = os.path.basename(input_file)
-            print(filename)
-            # Remove o .pdf do nome, caso va ser usado no plot
-            plotname = filename.strip('.pdf')
-
-            # Tika eh usado para fazer o parse dos dados do arquivo
-            parsedPDF = parser.from_file(input_file)
-            # Conteudo geral do arquivo eh extraido
-            pdf = parsedPDF["content"]
-            
-            # Pulos de linhas duplicados sao excluidas
-            pdf = pdf.replace('\n\n', '\n')
-            pdf = pdf.replace('  ', ' ')
-            pdf = pdf.replace('  ', ' ')
-            #Data do relatorio eh extraida
-            date_string=str(pdf)[str(pdf).find("Boletim EpidemiolÃ³gico do dia ")+len("Boletim EpidemiolÃ³gico do dia "):str(pdf).find("Boletim EpidemiolÃ³gico do dia ")+len("Boletim EpidemiolÃ³gico do dia ")+10]
-            date=date_string.split(".")
-            #print(date[0])
-            #print(date[1])
-            #print(date[2])
-            #print(pdf)
-            if not(len(date)==3):
-                pdf = pdf.replace('\n\n', '\n')
-                datas_encontradas=re.search("(\d)(\d)/(\d)(\d)/(\d)(\d)(\d)(\d)", pdf, re.DOTALL)
-                date_string=str(datas_encontradas.group(0))
-                date=date_string.split("/")
-                #print(date)
-
-
-            
-            #Sequencia de tentativas de extracao usando a funcao "create_df". Existem relatorios com tabelas de tamanhos diferentes, pois
-            #o numero de mortes e outros dados nao estavam presentes anteriormente, mas isso nao pode impedir a normalizacao dos dados 
-            #no banco, entao essa sequencia tenta garantir que todas as tabelas .csv geradas sejam o maximo possivel iguais.
             try:
+            #if 1:
+                # Nome do arquivo pdf
+                filename = os.path.basename(input_file)
+                print(filename)
+                # Remove o .pdf do nome, caso va ser usado no plot
+                plotname = filename.strip('.pdf')
+
+                # Tika eh usado para fazer o parse dos dados do arquivo
+                parsedPDF = parser.from_file(input_file)
+                # Conteudo geral do arquivo eh extraido
+                pdf = parsedPDF["content"]
+                
+                # Pulos de linhas duplicados sao excluidas
+                pdf = pdf.replace('\n\n', '\n')
+                pdf = pdf.replace('  ', ' ')
+                pdf = pdf.replace('  ', ' ')
+                #Data do relatorio eh extraida
+                date_string=str(pdf)[str(pdf).find("Boletim Epidemiológico do dia ")+len("Boletim Epidemiológico do dia "):str(pdf).find("Boletim Epidemiológico do dia ")+len("Boletim Epidemiológico do dia ")+10]
+                date=date_string.split(".")
+                #print(date[0])
+                #print(date[1])
+                #print(date[2])
+                #print(pdf)
+                if not(len(date)==3):
+                    pdf = pdf.replace('\n\n', '\n')
+                    datas_encontradas=re.search("(\d)(\d)/(\d)(\d)/(\d)(\d)(\d)(\d)", pdf, re.DOTALL)
+                    date_string=str(datas_encontradas.group(0))
+                    date=date_string.split("/")
+                    #print(date)
+                
+                #Sequencia de tentativas de extracao usando a funcao "create_df". Existem relatorios com tabelas de tamanhos diferentes, pois
+                #o numero de mortes e outros dados nao estavam presentes anteriormente, mas isso nao pode impedir a normalizacao dos dados 
+                #no banco, entao essa sequencia tenta garantir que todas as tabelas .csv geradas sejam o maximo possivel iguais.
                 try:
-                    covid_df = create_df(str(date[2]+"-"+date[1]+"-"+date[0]),pdf, expenditures_pattern, covid_pattern, covid_columns_8args,primeira_palavra_linha_tabela)
+                    try:
+                        covid_df = create_df(str(date[2]+"-"+date[1]+"-"+date[0]),pdf, expenditures_pattern, covid_pattern, covid_columns_8args,primeira_palavra_linha_tabela)
+                    except:
+                        covid_df = create_df(str(date[2]+"-"+date[1]+"-"+date[0]),pdf, expenditures_pattern, covid_pattern, covid_columns_6args,primeira_palavra_linha_tabela)
                 except:
-                    covid_df = create_df(str(date[2]+"-"+date[1]+"-"+date[0]),pdf, expenditures_pattern, covid_pattern, covid_columns_6args,primeira_palavra_linha_tabela)
-            except:
-                try:
-                    covid_df = create_df(str(date[2]+"-"+date[1]+"-"+date[0]),pdf, expenditures_pattern2, covid_pattern, covid_columns_8args,primeira_palavra_linha_tabela)
-                except:
-                    covid_df = create_df(str(date[2]+"-"+date[1]+"-"+date[0]),pdf, expenditures_pattern2, covid_pattern, covid_columns_6args,primeira_palavra_linha_tabela)
+                    try:
+                        covid_df = create_df(str(date[2]+"-"+date[1]+"-"+date[0]),pdf, expenditures_pattern2, covid_pattern, covid_columns_8args,primeira_palavra_linha_tabela)
+                    except:
+                        covid_df = create_df(str(date[2]+"-"+date[1]+"-"+date[0]),pdf, expenditures_pattern2, covid_pattern, covid_columns_6args,primeira_palavra_linha_tabela)
 
-            #print(covid_df)
-            # print(revenue_df)
+                #print(covid_df)
+                # print(revenue_df)
 
-            # Uso da funcao de plotagem
-            #create_plot(covid_df, "regiao", "regiao", "num", 'barh', [20,10], plotname+"Dados-Covid")
-            
-            #try:
-            if 1: #Descomente essa linha e comente as linhas try logo acima e todo o bloco except correspondente caso nao consiga encontrar de forma clara a fonte de uma excecao
+                # Uso da funcao de plotagem
+                #create_plot(covid_df, "regiao", "regiao", "num", 'barh', [20,10], plotname+"Dados-Covid")
+                
+                #try:
+                if 1: #Descomente essa linha e comente as linhas try logo acima e todo o bloco except correspondente caso nao consiga encontrar de forma clara a fonte de uma excecao
 
-                #o comando abaixo eh o responsavel por criar o arquivo csv exportando o frame do pacote pandas. A variavel ''plotname'' tem o mesmo nome do arquivo
-                #de destino, por isso foi reutilizado em todo o programa. Inicialmente, a intencao era que o programa salvasse os plots.
-                covid_df.to_csv(input_path+csv_backup_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                    #o comando abaixo eh o responsavel por criar o arquivo csv exportando o frame do pacote pandas. A variavel ''plotname'' tem o mesmo nome do arquivo
+                    #de destino, por isso foi reutilizado em todo o programa. Inicialmente, a intencao era que o programa salvasse os plots.
+                    covid_df.to_csv(input_path+csv_backup_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
 
-                if(Chama_script_banco_dados==True):
-                    covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
-                    os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str(input_path+csv_directory+"/"+nome_script_banco_dados))
-                    time.sleep(10)
-                    os.system("rm "+input_path+csv_directory+"/*.csv")
+                    if(Chama_script_banco_dados==True):
+                        covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                        os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str(input_path+csv_directory+"/"+nome_script_banco_dados))
+                        time.sleep(10)
+                        os.system("rm "+input_path+csv_directory+"/*.csv")
 
+                    with open(nome_arquivo_log, 'a', newline='') as f:
+                        writer = csv.writer(f)
+                        writer.writerow([(now.strftime("%Y-%m-%d %H:%M:%S")),plotname,"sucesso"])
+                        print("SUCESSO: "+str(plotname) )
+                        f.close()                
+                #except Exception as e:
+                    #exc_type, exc_obj, exc_tb = sys.exc_info()
+                    #fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                    #print("Warning:")
+                    #print(exc_type, fname, exc_tb.tb_lineno)
+                    #pdf = pdf.replace('\n\n', '\n')
+                    #datas_encontradas=re.search("(\d)(\d)/(\d)(\d)/(\d)(\d)(\d)(\d)", pdf, re.DOTALL)
+                    #date_string=str(datas_encontradas.group(0))
+                    #date=date_string.split("/")
+                    #print(date)
+                    #covid_df.to_csv(input_path+csv_backup_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                    #if(Chama_script_banco_dados==True):
+                    #    covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                    #    os.system(str(input_path+csv_directory+"/"+nome_script_banco_dados))
+                    #    time.sleep(5)
+                    #    os.remove(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                    
+
+
+            except Exception as e:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                print(exc_type, fname, exc_tb.tb_lineno)
+                if hasattr(e, 'message'):
+                    print(e.message)
+                else:
+                    print(e)
                 with open(nome_arquivo_log, 'a', newline='') as f:
                     writer = csv.writer(f)
-                    writer.writerow([(now.strftime("%Y-%m-%d %H:%M:%S")),plotname,"sucesso"])
-                    print("SUCESSO: "+str(plotname) )
-                    f.close()                
-            #except Exception as e:
-                #exc_type, exc_obj, exc_tb = sys.exc_info()
-                #fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                #print("Warning:")
-                #print(exc_type, fname, exc_tb.tb_lineno)
-                #pdf = pdf.replace('\n\n', '\n')
-                #datas_encontradas=re.search("(\d)(\d)/(\d)(\d)/(\d)(\d)(\d)(\d)", pdf, re.DOTALL)
-                #date_string=str(datas_encontradas.group(0))
-                #date=date_string.split("/")
-                #print(date)
-                #covid_df.to_csv(input_path+csv_backup_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
-                #if(Chama_script_banco_dados==True):
-                #    covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
-                #    os.system(str(input_path+csv_directory+"/"+nome_script_banco_dados))
-                #    time.sleep(5)
-                #    os.remove(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
-                
-
-
-        except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
-            if hasattr(e, 'message'):
-                print(e.message)
-            else:
-                print(e)
-            with open(nome_arquivo_log, 'a', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerow([(now.strftime("%Y-%m-%d %H:%M:%S")),plotname,"FRACASSO"])
-                print("FRACASSO: "+str(plotname) )
-                f.close()
-
+                    writer.writerow([(now.strftime("%Y-%m-%d %H:%M:%S")),plotname,"FRACASSO"])
+                    print("FRACASSO: "+str(plotname) )
+                    f.close()
 #####################################################################################################
 
 

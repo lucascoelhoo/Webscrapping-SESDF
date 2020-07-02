@@ -63,6 +63,7 @@ import csv
 import datetime
 import shutil
 from pathlib import Path
+import re
 ####################################################################################
 
 
@@ -71,7 +72,8 @@ from pathlib import Path
 link_sesdf='http://www.saude.df.gov.br/boletinsinformativos-divep-cieves/'
 nome_arquivo_log='log-extracao-web.csv'
 now = datetime.datetime.now()
-direc_folders=str(Path.cwd())+"/" #Como estamos usando relative paths, não precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessário usar / como divisor
+#direc_folders=str(Path.cwd().replace("\\","/"))+"/" #Como estamos usando relative paths, não precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessário usar / como divisor
+direc_folders=str("") #Como estamos usando relative paths, não precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessário usar / como divisor
 folder_report_name='PROGRAMA-informes-covid' 
 folder_download_name='PROGRAMA-informes-download'
 script_extrator_dados='Extrair-dados-pdf.py'
@@ -114,10 +116,10 @@ if 1:
         if not os.path.isfile(nome_arquivo_log):
             with open(nome_arquivo_log, 'a', newline='') as f:
                 writer = csv.writer(f)
-                writer.writerow(["DATE","QNTD DE LINKS","LINK","SUCESSO-FRACASSO"])
+                writer.writerow(["DATE","QNTD DE LINKS","LINK","NOME DO ARQUIVO","SUCESSO-FRACASSO"])
                 f.close()
         
-        files_downloaded = os.listdir(direc_folders+folder_download_name) # dir is your directory path
+        files_downloaded = os.listdir(str(direc_folders+folder_download_name)) # dir is your directory path
         for file in files_downloaded:
             os.remove(str(direc_folders+folder_download_name+str("/")+str(file)))
 
@@ -150,46 +152,67 @@ if 1:
         #print(number_files)
 
         r=requests.get(link_sesdf)
-        soup = BeautifulSoup(r.text, 'html.parser')
-        list_dir = os.listdir(direc_folders+folder_report_name)
+        soup = BeautifulSoup(r.text, 'html.parser')  
+        lista_elements=(soup.find("div", {"id":"conteudo"})).select('a')
+        lista_num_informes_elements=[]
+        for element,index_interno in zip(lista_elements,range(len(lista_elements))):
+            if(str(element.contents).find("Informe")==-1):
+                lista_elements.pop(index_interno)
+        for element in lista_elements:
+            #resolvendo as inconsistencias existentes nos conteudos das divs
+            aux_str= str(element.contents).replace('\\xa0', '')
+            aux_str=re.search(r"Informe.+\d+", aux_str, re.IGNORECASE)[0]
+            aux_str=re.search(r"\d+", aux_str, re.IGNORECASE)[0]
+            aux=aux_str
+            lista_num_informes_elements.append( int( aux ) )
+            #print(str("\n")+str(element.contents))
+            #print(aux_str)
+            #print( aux)   
+        list_dir = sorted(os.listdir(direc_folders+folder_report_name))
         for name,index_interno in zip(list_dir,range(len(list_dir))):
             if not name.endswith(".pdf"):
                 list_dir.pop(index_interno)
-        number_files = len(list_dir)
-        lista_elements=(soup.find("div", {"id":"conteudo"})).select('a')
-        index=number_files
+        if(len(list_dir)>0):
+            number_last_file = int((list_dir[len(list_dir)-1]).name.replace(".pdf",""))
+        else:
+            number_last_file=0
+        
+        #index=number_files
+        lista_num_informes_elements.sort()
 
-        while index<(len(lista_elements)):
-            name_file=""
-            try:
-                print(lista_elements[(len(lista_elements)-1)-index]['href'])
-                #print(str(date.today()))
-                wget.download(lista_elements[(len(lista_elements)-1)-index]['href'],direc_folders+folder_download_name)
-                files_downloaded = os.listdir(direc_folders+folder_download_name) # dir is your directory path
-                if(index+1<=9):
-                    name_file=str("0"+str(index+1)+str(".pdf"))
-                    os.rename(str(direc_folders+folder_download_name+str("/")+files_downloaded[0]),str(direc_folders+folder_report_name+str("/")+"0"+str(index+1)+str(".pdf")) )
-                else:
-                    name_file=str(str(index+1)+str(".pdf"))
-                    os.rename(str(direc_folders+folder_download_name+str("/")+files_downloaded[0]),str(direc_folders+folder_report_name+str("/")+str(index+1)+str(".pdf")) )
-                print(str(index+1)+str(".pdf"))
-                with open(nome_arquivo_log, 'a', newline='') as f:
-                    writer = csv.writer(f)
-                    writer.writerow([str((now.strftime("%Y-%m-%d %H:%M:%S"))),len(lista_elements),lista_elements[(len(lista_elements)-1)-index]['href'],"sucesso"])
-                    f.close()
-            except Exception as e:
-                print(e)
-                with open(nome_arquivo_log, 'a', newline='') as f:
-                    writer = csv.writer(f)
-                    writer.writerow([str((now.strftime("%Y-%m-%d %H:%M:%S"))),len(lista_elements),lista_elements[(len(lista_elements)-1)-index]['href'] if (lista_elements[(len(lista_elements)-1)-index]['href']) else "nothing","FRACASSO"])
-                    f.close()
-            index+=1
+        for num,index_interno in zip(lista_num_informes_elements,range(len(lista_num_informes_elements))):
+            print(num)
+            if(num>number_last_file):
+                time.sleep(1)
+                name_file=str(num)+str(".pdf")
+                try:
+                    print(lista_elements[(len(lista_elements)-1)-index_interno]['href'])
+                    #print(str(date.today()))
+                    wget.download(lista_elements[(len(lista_elements)-1)-index_interno]['href'],direc_folders+folder_download_name)
+                    files_downloaded = os.listdir(direc_folders+folder_download_name) # dir is your directory path
+                    os.rename(str(direc_folders+folder_download_name+str("/")+files_downloaded[0]),str(direc_folders+folder_report_name+str("/")+str(name_file)) )
+                    print(name_file)
+                    with open(nome_arquivo_log, 'a', newline='') as f:
+                        writer = csv.writer(f)
+                        writer.writerow([str((now.strftime("%Y-%m-%d %H:%M:%S"))),len(lista_elements),lista_elements[(len(lista_elements)-1)-index_interno]['href'],name_file,"sucesso"])
+                        f.close()
+                    #chamada para execucao do script que extrai os dados de arquivos em formato .pdf para tabelas em formato .csv, a chamada precisa do nome do arquivo
+                    #no linux é python3, no windows é apenas python
+                    print(str("python3 ")+str(direc_folders+script_extrator_dados+" "+name_file))
+                    os.system(str("python ")+str(direc_folders+script_extrator_dados+" "+name_file))
+                except Exception as e:
+                    print(e)
+                    with open(nome_arquivo_log, 'a', newline='') as f:
+                        writer = csv.writer(f)
+                        writer.writerow([str((now.strftime("%Y-%m-%d %H:%M:%S"))),len(lista_elements),lista_elements[index_interno]['href'] if (lista_elements[index_interno]['href']) else "nothing",name_file,"FRACASSO"])
+                        f.close()
+            else:
+                continue
 
-            #chamada para execucao do script que extrai os dados de arquivos em formato .pdf para tabelas em formato .csv, a chamada precisa do nome do arquivo
-            #no linux é python3, no windows é apenas python
-            os.system(str("python3 ")+str(direc_folders+script_extrator_dados+" "+name_file))
 
-            
+            #index+=1
+
+
 
             #Descomente o bloco abaixo caso queira limitar a execucao a uma dada quantidade de iteracoes
             #time.sleep(5)
@@ -203,7 +226,7 @@ if 1:
         print(e)
         with open(nome_arquivo_log, 'a', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow([str((now.strftime("%Y-%m-%d %H:%M:%S"))),str(0),"nothing","FRACASSO FALHA GERAL"])
+            writer.writerow([str((now.strftime("%Y-%m-%d %H:%M:%S"))),str(0),"nothing","nothing","FRACASSO FALHA GERAL"])
             f.close()
 
     #print("\n\nFIM DA SESSÃO, DORMINDO POR "+str(sleep_time)+" segundos")
