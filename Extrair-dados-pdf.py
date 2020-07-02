@@ -76,7 +76,7 @@ print(filename_entry)
 
 excluir_essa_linha="RA em investigaÃ§Ã£o" #Linha que, em alguns caso, apresentou problemas de formatacao e nao tem valor para pesquisa, e portanto, caso necessario, eh excluida da extracao
 
-input_path = str(Path.cwd())+"/" #Como estamos usando relative paths, nÃ£o precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessÃ¡rio usar / como divisor
+input_path = str(Path.cwd())+"/" #Como estamos usando relative paths, nÃƒÆ’Ã‚Â£o precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessÃƒÆ’Ã‚Â¡rio usar / como divisor
 
 reports_directory="PROGRAMA-informes-covid"
 
@@ -95,7 +95,7 @@ now = datetime.datetime.now()
 #deve ser posto na pasta "PROGRAMA-dados-extraidos-covid" e deve ser capaz de salvar
 #no banco de destino todos os arquivos em formato .csv quando for chamado. Apos
 #a chamada, todos os arquivos em formato .csv sao excluidos dessa pasta.
-Chama_script_banco_dados=False
+Chama_script_banco_dados=True
 nome_script_banco_dados="import_data.sh"
 ####################################################################################
 
@@ -390,8 +390,8 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
             # Uso da funcao de plotagem
             #create_plot(covid_df, "regiao", "regiao", "num", 'barh', [20,10], plotname+"Dados-Covid")
             
-            try:
-            #if 1: #Descomente essa linha e comente as linhas try logo acima e todo o bloco except correspondente caso nao consiga encontrar de forma clara a fonte de uma excecao
+            #try:
+            if 1: #Descomente essa linha e comente as linhas try logo acima e todo o bloco except correspondente caso nao consiga encontrar de forma clara a fonte de uma excecao
 
                 #o comando abaixo eh o responsavel por criar o arquivo csv exportando o frame do pacote pandas. A variavel ''plotname'' tem o mesmo nome do arquivo
                 #de destino, por isso foi reutilizado em todo o programa. Inicialmente, a intencao era que o programa salvasse os plots.
@@ -400,8 +400,8 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
                 if(Chama_script_banco_dados==True):
                     covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
                     os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str(input_path+csv_directory+"/"+nome_script_banco_dados))
-                    time.sleep(5)
-                    os.remove(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                    time.sleep(10)
+                    os.system("rm "+input_path+csv_directory+"/*.csv")
 
                 with open(nome_arquivo_log, 'a', newline='') as f:
                     writer = csv.writer(f)
@@ -442,6 +442,8 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
                 f.close()
 
 #####################################################################################################
+
+
 
 
 
