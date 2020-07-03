@@ -43,7 +43,7 @@
 #                       ---->Tabela em formato .csv com os nomes e coordenadas das localidades que serao buscadas na extracao. Essa lista funciona para filtragem e validacao
 #
 #Obs.: Esse script contem linhas comentadas que o habilitam a fazer a mesma extracao usando Selenium. Por hora nao se faz necessario,
-#      pois a extracao eh simples e feita usando o pacote Requests. Porem, caso a pagina web passe a ter rotinas de javascript mais avançadas,
+#      pois a extracao eh simples e feita usando o pacote Requests. Porem, caso a pagina web passe a ter rotinas de javascript mais avanÃƒÂ§adas,
 #      se torna necessario usar Selenium novamente. A preferencia pelo pacote Requests permanece pela maior velocidade e menor uso de recursos.
 ###########################################################################################################################################################################################
 
@@ -72,8 +72,7 @@ import re
 link_sesdf='http://www.saude.df.gov.br/boletinsinformativos-divep-cieves/'
 nome_arquivo_log='log-extracao-web.csv'
 now = datetime.datetime.now()
-#direc_folders=str(Path.cwd().replace("\\","/"))+"/" #Como estamos usando relative paths, não precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessário usar / como divisor
-direc_folders=str("") #Como estamos usando relative paths, não precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessário usar / como divisor
+direc_folders=str(Path.cwd()).replace("\\","/")+"/" 
 folder_report_name='PROGRAMA-informes-covid' 
 folder_download_name='PROGRAMA-informes-download'
 script_extrator_dados='Extrair-dados-pdf.py'
@@ -107,7 +106,7 @@ def strip_accents(text):
 
 #while 1:
 #Comente o if abaixo e descomente o while acim e o sleep ao final para ser um programa que roda em background
-#Trocou-se pela execução simples para integração com agendamento do "crontab" do linux
+#Trocou-se pela execucaoo simples para integracao com agendamento do "crontab" do linux
 if 1:
     print("\n\nINICIANDO NOVA SESSÃO\n")
     try:
@@ -173,16 +172,20 @@ if 1:
             if not name.endswith(".pdf"):
                 list_dir.pop(index_interno)
         if(len(list_dir)>0):
-            number_last_file = int((list_dir[len(list_dir)-1]).name.replace(".pdf",""))
+            number_last_file = int((sorted(list_dir)[-1]).replace(".pdf",""))
         else:
             number_last_file=0
+
+        lista_num_dir=[]
+        for name,index_interno in zip(list_dir,range(len(list_dir))):
+                lista_num_dir.append(int((list_dir[index_interno]).replace(".pdf","")))
         
         #index=number_files
         lista_num_informes_elements.sort()
 
         for num,index_interno in zip(lista_num_informes_elements,range(len(lista_num_informes_elements))):
             print(num)
-            if(num>number_last_file):
+            if(num not in lista_num_dir):
                 time.sleep(1)
                 name_file=str(num)+str(".pdf")
                 try:
@@ -197,9 +200,9 @@ if 1:
                         writer.writerow([str((now.strftime("%Y-%m-%d %H:%M:%S"))),len(lista_elements),lista_elements[(len(lista_elements)-1)-index_interno]['href'],name_file,"sucesso"])
                         f.close()
                     #chamada para execucao do script que extrai os dados de arquivos em formato .pdf para tabelas em formato .csv, a chamada precisa do nome do arquivo
-                    #no linux é python3, no windows é apenas python
+                    #no linux eh python3, no windows eh apenas python
                     print(str("python3 ")+str(direc_folders+script_extrator_dados+" "+name_file))
-                    os.system(str("python ")+str(direc_folders+script_extrator_dados+" "+name_file))
+                    os.system(str("python3 ")+str(direc_folders+script_extrator_dados+" "+name_file))
                 except Exception as e:
                     print(e)
                     with open(nome_arquivo_log, 'a', newline='') as f:
@@ -232,3 +235,8 @@ if 1:
     #print("\n\nFIM DA SESSÃO, DORMINDO POR "+str(sleep_time)+" segundos")
     #time.sleep(sleep_time)
 ####################################################################################
+
+
+
+
+

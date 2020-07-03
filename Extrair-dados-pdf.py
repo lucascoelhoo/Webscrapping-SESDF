@@ -1,4 +1,4 @@
-
+#!/usr/bin/python
 #########################################################################################################################################################################################################################
 #Desenvolvido por: Lucas Coelho de Almeida
 #
@@ -76,8 +76,7 @@ print(filename_entry)
 
 excluir_essa_linha="RA em investigação" #Linha que, em alguns caso, apresentou problemas de formatacao e nao tem valor para pesquisa, e portanto, caso necessario, eh excluida da extracao
 
-#input_path = str(Path.cwd()).replace("\\","/")+"/" #Como estamos usando relative paths, nÃƒÂ£o precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessÃƒÂ¡rio usar / como divisor
-input_path = str("") #Como estamos usando relative paths, nÃƒÂ£o precisamos do caminho, mas caso precisemos, basta alterar essa variavel, lembrando ser necessÃƒÂ¡rio usar / como divisor
+input_path = str(Path.cwd()).replace("\\","/")+"/"
 
 reports_directory="PROGRAMA-informes-covid"
 
@@ -98,6 +97,7 @@ now = datetime.datetime.now()
 #a chamada, todos os arquivos em formato .csv sao excluidos dessa pasta.
 Chama_script_banco_dados=True
 nome_script_banco_dados="import_data.sh"
+nome_script_banco_dados2="script-importacao.py"
 ####################################################################################
 
 
@@ -398,6 +398,7 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
                     if(Chama_script_banco_dados==True):
                         covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
                         os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str(input_path+csv_directory+"/"+nome_script_banco_dados))
+                        os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str("python3 ")+str(input_path+csv_directory+"/"+nome_script_banco_dados2))
                         time.sleep(10)
                         os.system("rm "+input_path+csv_directory+"/*.csv")
 
@@ -439,6 +440,7 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
                     print("FRACASSO: "+str(plotname) )
                     f.close()
 #####################################################################################################
+
 
 
 
