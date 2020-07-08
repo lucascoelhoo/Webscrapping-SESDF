@@ -203,8 +203,10 @@ if 1:
                     print(lista_elements[(len(lista_elements)-1)-index_interno]['href'])
                     #print(str(date.today()))
                     wget.download(lista_elements[(len(lista_elements)-1)-index_interno]['href'],direc_folders+folder_download_name)
+                    time.sleep(30)
                     files_downloaded = os.listdir(direc_folders+folder_download_name) # dir is your directory path
                     os.rename(str(direc_folders+folder_download_name+str("/")+files_downloaded[0]),str(direc_folders+folder_report_name+str("/")+str(name_file)) )
+                    time.sleep(30)
                     print(name_file)
                     with open(nome_arquivo_log, 'a', newline='') as f:
                         writer = csv.writer(f)
@@ -246,6 +248,7 @@ if 1:
     #print("\n\nFIM DA SESSÃO, DORMINDO POR "+str(sleep_time)+" segundos")
     #time.sleep(sleep_time)
 ####################################################################################
+
 
 
 
