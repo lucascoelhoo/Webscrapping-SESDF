@@ -390,23 +390,26 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
                 
                 #try:
                 if 1: #Descomente essa linha e comente as linhas try logo acima e todo o bloco except correspondente caso nao consiga encontrar de forma clara a fonte de uma excecao
+                    
+                    if not(os.path.isfile(input_path+csv_directory+"/"+plotname+'.csv')):
+                        #o comando abaixo eh o responsavel por criar o arquivo csv exportando o frame do pacote pandas. A variavel ''plotname'' tem o mesmo nome do arquivo
+                        #de destino, por isso foi reutilizado em todo o programa. Inicialmente, a intencao era que o programa salvasse os plots.
+                        #covid_df.to_csv(input_path+csv_backup_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                        covid_df.to_csv(input_path+csv_backup_directory+"/"+plotname+'.csv')
 
-                    #o comando abaixo eh o responsavel por criar o arquivo csv exportando o frame do pacote pandas. A variavel ''plotname'' tem o mesmo nome do arquivo
-                    #de destino, por isso foi reutilizado em todo o programa. Inicialmente, a intencao era que o programa salvasse os plots.
-                    covid_df.to_csv(input_path+csv_backup_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                        if(Chama_script_banco_dados==True):
+                            #covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
+                            covid_df.to_csv(input_path+csv_directory+"/"+plotname+'.csv')
+                            os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str(input_path+csv_directory+"/"+nome_script_banco_dados))
+                            os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str("python3 ")+str(input_path+csv_directory+"/"+nome_script_banco_dados2))
+                            time.sleep(10)
+                            os.system("rm "+input_path+csv_directory+"/*.csv")
 
-                    if(Chama_script_banco_dados==True):
-                        covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
-                        os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str(input_path+csv_directory+"/"+nome_script_banco_dados))
-                        os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str("python3 ")+str(input_path+csv_directory+"/"+nome_script_banco_dados2))
-                        time.sleep(10)
-                        os.system("rm "+input_path+csv_directory+"/*.csv")
-
-                    with open(nome_arquivo_log, 'a', newline='') as f:
-                        writer = csv.writer(f)
-                        writer.writerow([(now.strftime("%Y-%m-%d %H:%M:%S")),plotname,"sucesso"])
-                        print("SUCESSO: "+str(plotname) )
-                        f.close()                
+                        with open(nome_arquivo_log, 'a', newline='') as f:
+                            writer = csv.writer(f)
+                            writer.writerow([(now.strftime("%Y-%m-%d %H:%M:%S")),plotname,"sucesso"])
+                            print("SUCESSO: "+str(plotname) )
+                            f.close()                
                 #except Exception as e:
                     #exc_type, exc_obj, exc_tb = sys.exc_info()
                     #fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

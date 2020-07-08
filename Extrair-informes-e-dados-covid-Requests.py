@@ -153,14 +153,20 @@ if 1:
         r=requests.get(link_sesdf)
         soup = BeautifulSoup(r.text, 'html.parser')  
         lista_elements=(soup.find("div", {"id":"conteudo"})).select('a')
+        #use para debugar erros vindos da pagina html
+        #for index in range(len(lista_elements)):
+        #    print(lista_elements[(len(lista_elements)-1)-index].contents)
+        #    print("\n")
+        #exit()
+        
         lista_num_informes_elements=[]
         for element,index_interno in zip(lista_elements,range(len(lista_elements))):
-            if(str(element.contents).find("Informe")==-1):
+            if(str(element.contents).find("forme")==-1):
                 lista_elements.pop(index_interno)
         for element in lista_elements:
             #resolvendo as inconsistencias existentes nos conteudos das divs
             aux_str= str(element.contents).replace('\\xa0', '')
-            aux_str=re.search(r"Informe.+\d+", aux_str, re.IGNORECASE)[0]
+            aux_str=re.search(r"forme.+\d+", aux_str, re.IGNORECASE)[0]
             aux_str=re.search(r"\d+", aux_str, re.IGNORECASE)[0]
             aux=aux_str
             lista_num_informes_elements.append( int( aux ) )
@@ -182,7 +188,12 @@ if 1:
         
         #index=number_files
         lista_num_informes_elements.sort()
-
+        #use para debugar erros no processamento do html
+        #for index in range(len(lista_num_informes_elements)):
+        #    print(lista_num_informes_elements[index])
+        #    print(lista_elements[(len(lista_elements)-1)-index].contents)
+        #    print("\n")
+        #exit()
         for num,index_interno in zip(lista_num_informes_elements,range(len(lista_num_informes_elements))):
             print(num)
             if(num not in lista_num_dir):
