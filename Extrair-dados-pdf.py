@@ -95,7 +95,7 @@ now = datetime.datetime.now()
 #deve ser posto na pasta "PROGRAMA-dados-extraidos-covid" e deve ser capaz de salvar
 #no banco de destino todos os arquivos em formato .csv quando for chamado. Apos
 #a chamada, todos os arquivos em formato .csv sao excluidos dessa pasta.
-Chama_script_banco_dados=True
+Chama_script_banco_dados=False
 nome_script_banco_dados="import_data.sh"
 nome_script_banco_dados2="script-importacao.py"
 ####################################################################################
@@ -401,7 +401,7 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
                             #covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
                             covid_df.to_csv(input_path+csv_directory+"/"+plotname+'.csv')
                             os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str(input_path+csv_directory+"/"+nome_script_banco_dados))
-                            os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str("python3 ")+str(input_path+csv_directory+"/"+nome_script_banco_dados2))
+                            os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str("python3 ")+str(input_path+csv_directory+"/"+nome_script_banco_dados2)+" "+plotname+'.csv')
                             time.sleep(10)
                             os.system("rm "+input_path+csv_directory+"/*.csv")
 

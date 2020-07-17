@@ -203,10 +203,10 @@ if 1:
                     print(lista_elements[(len(lista_elements)-1)-index_interno]['href'])
                     #print(str(date.today()))
                     wget.download(lista_elements[(len(lista_elements)-1)-index_interno]['href'],direc_folders+folder_download_name)
-                    time.sleep(30)
+                    time.sleep(5)
                     files_downloaded = os.listdir(direc_folders+folder_download_name) # dir is your directory path
                     os.rename(str(direc_folders+folder_download_name+str("/")+files_downloaded[0]),str(direc_folders+folder_report_name+str("/")+str(name_file)) )
-                    time.sleep(30)
+                    time.sleep(5)
                     print(name_file)
                     with open(nome_arquivo_log, 'a', newline='') as f:
                         writer = csv.writer(f)
@@ -215,7 +215,7 @@ if 1:
                     #chamada para execucao do script que extrai os dados de arquivos em formato .pdf para tabelas em formato .csv, a chamada precisa do nome do arquivo
                     #no linux eh python3, no windows eh apenas python
                     print(str("python3 ")+str(direc_folders+script_extrator_dados+" "+name_file))
-                    os.system(str("python3 ")+str(direc_folders+script_extrator_dados+" "+name_file))
+                    os.system(str("python ")+str(direc_folders+script_extrator_dados+" "+name_file))
                 except Exception as e:
                     print(e)
                     with open(nome_arquivo_log, 'a', newline='') as f:
