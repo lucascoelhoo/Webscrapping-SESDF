@@ -45,7 +45,7 @@ for input_file in glob.glob(os.path.join(csvfiles_path, filename_entry)):
         break
     if(adicionar):
         conn = sqlite3.connect(db_path+"/"+db_name)
-        df.to_sql(con=conn,name=table_name, if_exists='replace', index=False)
+        df.to_sql(con=conn,name=table_name, if_exists='append', index=False)
         conn.commit()
         conn.close()
     print(input_file)
