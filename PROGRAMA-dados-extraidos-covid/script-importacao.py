@@ -7,7 +7,6 @@ import sys
 import sqlite3
 
 
-
 #db_path="/home/simop/api-dados-extraidos-sesdf"
 db_path="C:/Users/lucas/Desktop/UNB/Mestrado/Projetos/App-Covid-19/api-dados-extraidos-sesdf"
 db_name="dados-extraidos-covid19-sesdf.db"
@@ -15,8 +14,8 @@ table_name='dados-extraidos-covid19-sesdf'
 print("Script SQLite")
 #conn = sqlite3.connect(os.path.join(db_path, db_name)) # change to 'sqlite:///your_filename.db'
 csvfiles_path=str(Path.cwd())
-#filename_entry=sys.argv[1]
-filename_entry="37.csv"
+filename_entry=sys.argv[1]
+#filename_entry="37.csv"
 for input_file in glob.glob(os.path.join(csvfiles_path, filename_entry)):
     df = pandas.read_csv(input_file, index_col=0)
     df.drop_duplicates(keep=False,inplace=True)
