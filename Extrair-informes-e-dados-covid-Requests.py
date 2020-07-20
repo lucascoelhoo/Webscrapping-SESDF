@@ -77,6 +77,9 @@ folder_report_name='PROGRAMA-informes-covid'
 folder_download_name='PROGRAMA-informes-download'
 script_extrator_dados='Extrair-dados-pdf.py'
 sleep_time=18000 #18000 segundos sao 5 horas
+
+
+windows=True
 ####################################################################################
 
 
@@ -205,6 +208,11 @@ if 1:
         #print("")
         #print(*lista_num_dir,sep="\n")
         #exit()
+
+        #colocando em ordem crescente de acordo com o site
+        lista_num_informes_elements.reverse()
+        lista_elements.reverse()
+        
         for num,index_interno in zip(lista_num_informes_elements,range(len(lista_num_informes_elements))):
             print(num)
             #if(num not in lista_num_dir):
@@ -227,7 +235,11 @@ if 1:
                     #chamada para execucao do script que extrai os dados de arquivos em formato .pdf para tabelas em formato .csv, a chamada precisa do nome do arquivo
                     #no linux eh python3, no windows eh apenas python
                     print(str("python3 ")+str(direc_folders+script_extrator_dados+" "+name_file))
-                    os.system(str("python ")+str(direc_folders+script_extrator_dados+" "+name_file))
+                    if windows:
+                        os.system(str("python ")+str(direc_folders+script_extrator_dados+" "+name_file))
+                    else:
+                        os.system(str("python3 ")+str(direc_folders+script_extrator_dados+" "+name_file))
+                     
                 except Exception as e:
                     print(e)
                     with open(nome_arquivo_log, 'a', newline='') as f:

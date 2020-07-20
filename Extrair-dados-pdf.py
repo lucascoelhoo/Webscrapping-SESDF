@@ -98,6 +98,9 @@ now = datetime.datetime.now()
 Chama_script_banco_dados=False
 nome_script_banco_dados="import_data.sh"
 nome_script_banco_dados2="script-importacao.py"
+
+
+windows=True
 ####################################################################################
 
 
@@ -401,10 +404,17 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
                             #covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
                             covid_df.to_csv(input_path+csv_directory+"/"+plotname+'.csv')
                             os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str(input_path+csv_directory+"/"+nome_script_banco_dados))
-                            os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str("python3 ")+str(input_path+csv_directory+"/"+nome_script_banco_dados2)+" "+plotname+'.csv')
+                            if windows:
+                                os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str("python ")+str(input_path+csv_directory+"/"+nome_script_banco_dados2)+" "+plotname+'.csv')
+                            else:
+                                os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str("python3 ")+str(input_path+csv_directory+"/"+nome_script_banco_dados2)+" "+plotname+'.csv')
                             time.sleep(10)
-                            os.system("rm "+input_path+csv_directory+"/*.csv")
-
+                            if windows:
+                                try:
+                                    os.remove(input_path+csv_directory+"/"+plotname+'.csv')
+                                except:{}
+                            else:
+                                os.system("rm "+input_path+csv_directory+"/*.csv")
                         with open(nome_arquivo_log, 'a', newline='') as f:
                             writer = csv.writer(f)
                             writer.writerow([(now.strftime("%Y-%m-%d %H:%M:%S")),plotname,"sucesso"])
