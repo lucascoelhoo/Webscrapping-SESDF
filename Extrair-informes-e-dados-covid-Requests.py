@@ -79,7 +79,11 @@ script_extrator_dados='Extrair-dados-pdf.py'
 sleep_time=18000 #18000 segundos sao 5 horas
 
 
+<<<<<<< HEAD
 windows=False
+=======
+windows=True
+>>>>>>> a225cb92413f5d9bf08ca4cc6b81ad6288765dd1
 ####################################################################################
 
 
@@ -202,6 +206,7 @@ if 1:
                 continue
         for element in lista_elements:
             #resolvendo as inconsistencias existentes nos conteudos das divs
+<<<<<<< HEAD
             try:
                aux_str= str(element.contents).replace('\\xa0', '').replace('\\u0301','')
                aux_str=re.search(r"forme.+\d+", aux_str, re.IGNORECASE)[0]
@@ -213,6 +218,16 @@ if 1:
                #print( aux)
             except:
                continue
+=======
+            aux_str= str(element.contents).replace('\\xa0', '')
+            aux_str=re.search(r"forme.+\d+", aux_str, re.IGNORECASE)[0]
+            aux_str=re.search(r"\d+", aux_str, re.IGNORECASE)[0]
+            aux=aux_str
+            lista_num_informes_elements.append( int( aux ) )
+            #print(str("\n")+str(element.contents))
+            #print(aux_str)
+            #print( aux)
+>>>>>>> a225cb92413f5d9bf08ca4cc6b81ad6288765dd1
         #lista_num_informes_elements.sort()
         #print(*lista_num_informes_elements,sep="\n")
         #quit()

@@ -101,7 +101,9 @@ nome_script_banco_dados="import_data.sh"
 nome_script_banco_dados2="script-importacao.py"
 
 
+
 windows=False
+
 ####################################################################################
 
 

@@ -7,8 +7,13 @@ import sys
 import sqlite3
 
 
+<<<<<<< HEAD
 db_path="/home/simop/api-dados-extraidos-sesdf"
 #db_path="C:/Users/lucas/Desktop/UNB/Mestrado/Projetos/App-Covid-19/api-dados-extraidos-sesdf"
+=======
+#db_path="/home/simop/api-dados-extraidos-sesdf"
+db_path="C:/Users/lucas/Desktop/UNB/Mestrado/Projetos/App-Covid-19/api-dados-extraidos-sesdf"
+>>>>>>> a225cb92413f5d9bf08ca4cc6b81ad6288765dd1
 db_name="dados-extraidos-covid19-sesdf.db"
 table_name='dados-extraidos-covid19-sesdf'
 print("Script SQLite")
