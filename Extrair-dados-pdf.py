@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/python
 #########################################################################################################################################################################################################################
 #Desenvolvido por: Lucas Coelho de Almeida
@@ -95,9 +96,12 @@ now = datetime.datetime.now()
 #deve ser posto na pasta "PROGRAMA-dados-extraidos-covid" e deve ser capaz de salvar
 #no banco de destino todos os arquivos em formato .csv quando for chamado. Apos
 #a chamada, todos os arquivos em formato .csv sao excluidos dessa pasta.
-Chama_script_banco_dados=False
+Chama_script_banco_dados=True
 nome_script_banco_dados="import_data.sh"
 nome_script_banco_dados2="script-importacao.py"
+
+
+windows=False
 ####################################################################################
 
 
@@ -239,6 +243,8 @@ def create_df(data_pdf,pdf_content, content_pattern, line_pattern, column_headin
                 if(len(line_items)<=7):
                     line_items.append(int(0))
                     line_items.append(int(0))
+                if(len(line_items)==10):
+                    line_items.pop(int(9))
                 # all of the lines that will become rows in the DataFrame
                 list_of_line_items.append(line_items)
             except Exception as e:#{}
@@ -351,6 +357,7 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
                 pdf = parsedPDF["content"]
                 
                 # Pulos de linhas duplicados sao excluidas
+                print("Tentarei fazer replace agora!")
                 pdf = pdf.replace('\n\n', '\n')
                 pdf = pdf.replace('  ', ' ')
                 pdf = pdf.replace('  ', ' ')
@@ -401,10 +408,17 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
                             #covid_df.to_csv(input_path+csv_directory+"/"+plotname+"_"+date[2]+"-"+date[1]+"-"+date[0]+'.csv')
                             covid_df.to_csv(input_path+csv_directory+"/"+plotname+'.csv')
                             os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str(input_path+csv_directory+"/"+nome_script_banco_dados))
-                            os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str("python3 ")+str(input_path+csv_directory+"/"+nome_script_banco_dados2)+" "+plotname+'.csv')
+                            if windows:
+                                os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str("python ")+str(input_path+csv_directory+"/"+nome_script_banco_dados2)+" "+plotname+'.csv')
+                            else:
+                                os.system(str("cd ")+str(input_path)+csv_directory+str(" && ")+str("python3 ")+str(input_path+csv_directory+"/"+nome_script_banco_dados2)+" "+plotname+'.csv')
                             time.sleep(10)
-                            os.system("rm "+input_path+csv_directory+"/*.csv")
-
+                            if windows:
+                                try:
+                                    os.remove(input_path+csv_directory+"/"+plotname+'.csv')
+                                except:{}
+                            else:
+                                os.system("rm "+input_path+csv_directory+"/*.csv")
                         with open(nome_arquivo_log, 'a', newline='') as f:
                             writer = csv.writer(f)
                             writer.writerow([(now.strftime("%Y-%m-%d %H:%M:%S")),plotname,"sucesso"])
@@ -443,6 +457,7 @@ for input_file in glob.glob(os.path.join(input_path+reports_directory, filename_
                     print("FRACASSO: "+str(plotname) )
                     f.close()
 #####################################################################################################
+
 
 
 

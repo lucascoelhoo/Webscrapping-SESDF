@@ -77,6 +77,9 @@ folder_report_name='PROGRAMA-informes-covid'
 folder_download_name='PROGRAMA-informes-download'
 script_extrator_dados='Extrair-dados-pdf.py'
 sleep_time=18000 #18000 segundos sao 5 horas
+
+
+windows=False
 ####################################################################################
 
 
@@ -161,48 +164,102 @@ if 1:
         
         lista_num_informes_elements=[]
         for element,index_interno in zip(lista_elements,range(len(lista_elements))):
-            if(str(element.contents).find("forme")==-1):
-                lista_elements.pop(index_interno)
+            try:
+                if(lista_elements and str(element.contents).find("forme")==-1):
+                    lista_elements.pop(index_interno)
+                if(lista_elements and str(lista_elements[index_interno].contents).find("forme")==-1):
+                    lista_elements.pop(index_interno)
+                if(lista_elements and str(lista_elements[index_interno].contents).find("forme")==-1):
+                    lista_elements.pop(index_interno)
+                if(lista_elements and str(lista_elements[index_interno].contents).find("forme")==-1):
+                    lista_elements.pop(index_interno)
+                if(lista_elements and str(lista_elements[index_interno].contents).find("forme")==-1):
+                    lista_elements.pop(index_interno)
+                if(lista_elements and str(lista_elements[index_interno].contents).find("forme")==-1):
+                    lista_elements.pop(index_interno)
+                if(lista_elements and str(lista_elements[index_interno].contents).find("forme")==-1):
+                    lista_elements.pop(index_interno)
+            except:
+                continue
+
+        for element,index_interno in zip(lista_elements,range(len(lista_elements))):
+            try:
+                if(lista_elements and str(element.contents).find("forme")==-1):
+                    lista_elements.pop(index_interno)
+                if(lista_elements and str(lista_elements[index_interno].contents).find("forme")==-1):
+                    lista_elements.pop(index_interno)
+                if(lista_elements and str(lista_elements[index_interno].contents).find("forme")==-1):
+                    lista_elements.pop(index_interno)
+                if(lista_elements and str(lista_elements[index_interno].contents).find("forme")==-1):
+                    lista_elements.pop(index_interno)
+                if(lista_elements and str(lista_elements[index_interno].contents).find("forme")==-1):
+                    lista_elements.pop(index_interno)
+                if(lista_elements and str(lista_elements[index_interno].contents).find("forme")==-1):
+                    lista_elements.pop(index_interno)
+                if(lista_elements and str(lista_elements[index_interno].contents).find("forme")==-1):
+                    lista_elements.pop(index_interno)
+            except:
+                continue
         for element in lista_elements:
             #resolvendo as inconsistencias existentes nos conteudos das divs
-            aux_str= str(element.contents).replace('\\xa0', '')
-            aux_str=re.search(r"forme.+\d+", aux_str, re.IGNORECASE)[0]
-            aux_str=re.search(r"\d+", aux_str, re.IGNORECASE)[0]
-            aux=aux_str
-            lista_num_informes_elements.append( int( aux ) )
-            #print(str("\n")+str(element.contents))
-            #print(aux_str)
-            #print( aux)   
+            try:
+               aux_str= str(element.contents).replace('\\xa0', '').replace('\\u0301','')
+               aux_str=re.search(r"forme.+\d+", aux_str, re.IGNORECASE)[0]
+               aux_str=re.search(r"\d+", aux_str, re.IGNORECASE)[0]
+               aux=aux_str
+               lista_num_informes_elements.append( int( aux ) )
+               #print(str("\n")+str(element.contents))
+               #print(aux_str)
+               #print( aux)
+            except:
+               continue
+        #lista_num_informes_elements.sort()
+        #print(*lista_num_informes_elements,sep="\n")
+        #quit()
         list_dir = sorted(os.listdir(direc_folders+folder_report_name))
         for name,index_interno in zip(list_dir,range(len(list_dir))):
             if not name.endswith(".pdf"):
                 list_dir.pop(index_interno)
+        list_dir.sort(key=lambda list_dir:int(list_dir.replace(".pdf","")))
+        #print(*list_dir,sep="\n")
+        #quit()
         if(len(list_dir)>0):
-            number_last_file = int((sorted(list_dir)[-1]).replace(".pdf",""))
+            number_last_file = int(list_dir[-1].replace(".pdf",""))
         else:
             number_last_file=0
 
         lista_num_dir=[]
         for name,index_interno in zip(list_dir,range(len(list_dir))):
                 lista_num_dir.append(int((list_dir[index_interno]).replace(".pdf","")))
-        
+        lista_num_dir.sort()
         #index=number_files
-        lista_num_informes_elements.sort()
+        #lista_num_informes_elements.sort()
         #use para debugar erros no processamento do html
         #for index in range(len(lista_num_informes_elements)):
         #    print(lista_num_informes_elements[index])
         #    print(lista_elements[(len(lista_elements)-1)-index].contents)
         #    print("\n")
         #exit()
+        #for element, element2 in zip(lista_num_informes_elements,lista_elements):
+        #    print(element,element2.contents,"\n")
+        #print("")
+        #print(*lista_num_dir,sep="\n")
+        #exit()
+
+        #colocando em ordem crescente de acordo com o site
+        lista_num_informes_elements.reverse()
+        lista_elements.reverse()
+        
         for num,index_interno in zip(lista_num_informes_elements,range(len(lista_num_informes_elements))):
             print(num)
-            if(num not in lista_num_dir):
+            #if(num not in lista_num_dir):
+            if not(os.path.isfile(direc_folders+folder_report_name+"/"+str(num)+".pdf")):
                 time.sleep(1)
                 name_file=str(num)+str(".pdf")
                 try:
-                    print(lista_elements[(len(lista_elements)-1)-index_interno]['href'])
+                    print(lista_elements[index_interno]['href'])
                     #print(str(date.today()))
-                    wget.download(lista_elements[(len(lista_elements)-1)-index_interno]['href'],direc_folders+folder_download_name)
+                    wget.download(lista_elements[index_interno]['href'],direc_folders+folder_download_name)
                     time.sleep(5)
                     files_downloaded = os.listdir(direc_folders+folder_download_name) # dir is your directory path
                     os.rename(str(direc_folders+folder_download_name+str("/")+files_downloaded[0]),str(direc_folders+folder_report_name+str("/")+str(name_file)) )
@@ -210,12 +267,16 @@ if 1:
                     print(name_file)
                     with open(nome_arquivo_log, 'a', newline='') as f:
                         writer = csv.writer(f)
-                        writer.writerow([str((now.strftime("%Y-%m-%d %H:%M:%S"))),len(lista_elements),lista_elements[(len(lista_elements)-1)-index_interno]['href'],name_file,"sucesso"])
+                        writer.writerow([str((now.strftime("%Y-%m-%d %H:%M:%S"))),len(lista_elements),lista_elements[index_interno]['href'],name_file,"sucesso"])
                         f.close()
                     #chamada para execucao do script que extrai os dados de arquivos em formato .pdf para tabelas em formato .csv, a chamada precisa do nome do arquivo
                     #no linux eh python3, no windows eh apenas python
                     print(str("python3 ")+str(direc_folders+script_extrator_dados+" "+name_file))
-                    os.system(str("python ")+str(direc_folders+script_extrator_dados+" "+name_file))
+                    if windows:
+                        os.system(str("python ")+str(direc_folders+script_extrator_dados+" "+name_file))
+                    else:
+                        os.system(str("python3 ")+str(direc_folders+script_extrator_dados+" "+name_file))
+                     
                 except Exception as e:
                     print(e)
                     with open(nome_arquivo_log, 'a', newline='') as f:
@@ -248,6 +309,7 @@ if 1:
     #print("\n\nFIM DA SESSÃO, DORMINDO POR "+str(sleep_time)+" segundos")
     #time.sleep(sleep_time)
 ####################################################################################
+
 
 
 
